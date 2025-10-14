@@ -4,6 +4,7 @@ import { User } from "../entities/user.entity";
 import { AppDataSource } from "../config/database.config";
 import { ResponseError } from "../errors/response.error";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export class UserService {
   static async signup(request: {
@@ -39,12 +40,72 @@ export class UserService {
   static async signin(request: {
     username: string,
     password: string,
-  }): Promise<null> {
+  }): Promise<{
+    id: string,
+    name: string,
+    username: string,
+    accessToken: string,
+    refreshToken: string,
+  }> {
     const validatedData = Validation.validate(UserValidation.SIGNIN, request);
-    return null;
+
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: {
+        username: validatedData.username
+      }
+    });
+
+    if (!user){
+      //error
+      throw new ResponseError(404, "User not found");
+    }
+
+    const isPasswordValid = await bcrypt.compare(validatedData.password, user.password)
+    if(!isPasswordValid){
+      throw new ResponseError(400, "Invalid password");
+    }
+
+    const accessToken = jwt.sign({
+      id: user.id,
+      username: user.username,
+    }, process.env.JWT_ACCESS_SECRET!, {
+        expiresIn: "15m"
+    });
+    const refreshToken = jwt.sign({
+      id: user.id,
+      username: user.username,
+    }, process.env.JWT_REFRESH_SECRET!, {
+        expiresIn: "7d"
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      username: user.name,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    }
   }
 
-  static async signout(){
+  static async refreshToken(request: string){
+    const refreshToken = request;
 
+    if (refreshToken == null) {
+      throw new ResponseError(401, "Unauthorized");
+    }
+
+    const decodeUser: any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
+
+    const accessToken = jwt.sign({
+      id: decodeUser.id,
+      username: decodeUser.username,
+    }, process.env.JWT_ACCESS_SECRET!, {
+        expiresIn: "15m"
+    });
+
+    return {
+      accessToken: accessToken,
+    }
   }
 }

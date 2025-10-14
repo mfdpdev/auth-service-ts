@@ -31,7 +31,7 @@ export const errorMiddleware = (error: Error, req: Request, res: Response, next:
     res.status(error.status).json({
       statusCode: error.status,
       status: "error",
-      errors: error.message
+      errors: error.message,
     });
   }else{
 
@@ -44,7 +44,9 @@ export const errorMiddleware = (error: Error, req: Request, res: Response, next:
     });
 
     res.status(500).json({
-      errors: error.message
+      statusCode: 500,
+      status: "error",
+      errors: error.message,
     });
   }
 }

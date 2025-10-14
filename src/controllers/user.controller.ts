@@ -4,10 +4,22 @@ import { UserService } from "../services/user.service";
 export class UserController {
   static async signin(req: Request, res: Response, next: NextFunction){
     try {
+      const { accessToken, refreshToken, ...data} = await UserService.signin(req.body);
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        // secure: false,
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 7 //7 hari
+      });
+
       res.status(200).json({
         statusCode: 200,
         status: "success",
-        data: ""
+        data: {
+          accessToken,
+          ...data
+        }
       });
     } catch (e) {
       next(e);
@@ -33,10 +45,43 @@ export class UserController {
 
   static async signout(req: Request, res: Response, next: NextFunction){
     try {
+      res.clearCookie('refreshToken', { 
+        httpOnly: true, 
+        // secure: false,
+        sameSite: 'lax' 
+      });
+
       res.status(200).json({
-        data: "ok"
+        statusCode: 200,
+        status: "success",
+        data: "OK",
       });
     } catch (e) {
+      res.clearCookie('refreshToken', { 
+        httpOnly: true, 
+        // secure: false,
+        sameSite: 'lax' 
+      });
+      next(e);
+    }
+  }
+
+  static async refreshToken(req: Request, res: Response, next: NextFunction){
+    try {
+      const { accessToken } = await UserService.refreshToken(req.cookies.refreshToken);
+      res.status(200).json({
+        statusCode: 200,
+        status: "success",
+        data: {
+          accessToken,
+        },
+      });
+    } catch (e) {
+      res.clearCookie('refreshToken', { 
+        httpOnly: true, 
+        // secure: false,
+        sameSite: 'lax' 
+      });
       next(e);
     }
   }
