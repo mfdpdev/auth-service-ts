@@ -4,9 +4,9 @@ import logger from "../applications/logger";
 import { ValidationError } from "joi";
 
 export const errorMiddleware = (error: Error, req: Request, res: Response, next: NextFunction) => {
-  if((error as any).isJoi){
+  // if((error as any).isJoi){
+  if(error instanceof ValidationError){
     const joiError = error as ValidationError;
-
     logger.warn({
       msg: 'Validation failed',
       path: req.path,
@@ -14,7 +14,9 @@ export const errorMiddleware = (error: Error, req: Request, res: Response, next:
       details: joiError.details,
     });
 
-    res.status(500).json({
+    res.status(400).json({
+      statusCode: 400,
+      status: "error",
       errors: error.message
     });
   }else if(error instanceof ResponseError) {

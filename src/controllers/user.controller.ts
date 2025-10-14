@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
+import { UserService } from "../services/user.service";
 
 export class UserController {
   static async signin(req: Request, res: Response, next: NextFunction){
     try {
       res.status(200).json({
-        data: "ok"
+        statusCode: 200,
+        status: "success",
+        data: ""
       });
     } catch (e) {
       next(e);
@@ -13,15 +16,18 @@ export class UserController {
 
   static async signup(req: Request, res: Response, next: NextFunction){
     try {
+      const result = await UserService.signup(req.body);
       res.status(200).json({
-        data: "ok"
+        statusCode: 200,
+        status: "success",
+        data: result
       });
-    } catch (e) {
+    } catch (e: any) {
       next(e);
     }
   }
 
-  static async logout(req: Request, res: Response, next: NextFunction){
+  static async signout(req: Request, res: Response, next: NextFunction){
     try {
       res.status(200).json({
         data: "ok"
