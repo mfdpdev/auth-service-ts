@@ -33,7 +33,7 @@ export class UserValidation {
         'string.min': 'Password should have at least 6 characters',
         'string.max': 'Password should have at most 128 characters',
       }),
-  });
+  }).strict();
 
   static readonly SIGNIN: ObjectSchema = Joi.object({
     username: Joi.string()
@@ -57,5 +57,5 @@ export class UserValidation {
         'string.min': 'Password should have at least 6 characters',
         'string.max': 'Password should have at most 128 characters',
       }),
-  });
+  }).strict();
 }
