@@ -2,7 +2,6 @@ import 'reflect-metadata'
 import { DataSource } from "typeorm";
 import { TypeOrmPinoLogger } from "./typeorm-logger";
 import dotenv from "dotenv"
-import { User } from '../entities/user.entity';
 
 dotenv.config()
 
@@ -14,9 +13,6 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   entities: ['src/entities/**/*.ts'],
-  // entities: [
-  //   User,
-  // ],
   migrations: ['src/migrations/**/*.ts'],
   synchronize: false,
   logging: true,

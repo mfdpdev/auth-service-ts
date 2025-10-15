@@ -5,13 +5,10 @@ import { AppDataSource } from "../config/database.config";
 import { ResponseError } from "../errors/response.error";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { SignInRequest, SignUpRequest } from "../type/user-request";
 
 export class UserService {
-  static async signup(request: {
-    name: string,
-    username: string,
-    password: string,
-  }): Promise<User> {
+  static async signup(request: SignUpRequest): Promise<User> {
     const validatedData = Validation.validate(UserValidation.SIGNUP, request);
 
     const userRepository = AppDataSource.getRepository(User);
@@ -22,7 +19,6 @@ export class UserService {
     });
 
     if (existingUser){
-      //error
       throw new ResponseError(400, "Username already taken");
     }
 
@@ -37,10 +33,7 @@ export class UserService {
     return user;
   }
 
-  static async signin(request: {
-    username: string,
-    password: string,
-  }): Promise<{
+  static async signin(request: SignInRequest): Promise<{
     id: string,
     name: string,
     username: string,
@@ -57,7 +50,6 @@ export class UserService {
     });
 
     if (!user){
-      //error
       throw new ResponseError(404, "User not found");
     }
 
@@ -88,9 +80,7 @@ export class UserService {
     }
   }
 
-  static async refreshToken(request: string){
-    const refreshToken = request;
-
+  static async refreshToken(refreshToken: string){
     if (refreshToken == null) {
       throw new ResponseError(401, "Unauthorized");
     }

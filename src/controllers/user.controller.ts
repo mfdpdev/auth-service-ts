@@ -8,7 +8,7 @@ export class UserController {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        // secure: false,
+        secure: process.env.ENV == "production",
         sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 7 //7 hari
       });
@@ -43,11 +43,11 @@ export class UserController {
     }
   }
 
-  static async signout(req: Request, res: Response, next: NextFunction){
+  static async signout(_: Request, res: Response, next: NextFunction){
     try {
       res.clearCookie('refreshToken', { 
         httpOnly: true, 
-        // secure: false,
+        secure: process.env.ENV == "production",
         sameSite: 'lax' 
       });
 
@@ -59,7 +59,7 @@ export class UserController {
     } catch (e) {
       res.clearCookie('refreshToken', { 
         httpOnly: true, 
-        // secure: false,
+        secure: process.env.ENV == "production",
         sameSite: 'lax' 
       });
       next(e);
@@ -79,7 +79,7 @@ export class UserController {
     } catch (e) {
       res.clearCookie('refreshToken', { 
         httpOnly: true, 
-        // secure: false,
+        secure: process.env.ENV == "production",
         sameSite: 'lax' 
       });
       next(e);

@@ -1,36 +1,47 @@
-import { Logger as TypeOrmLogger, QueryRunner } from "typeorm";
+import { QueryRunner, AbstractLogger, LogLevel } from "typeorm";
 import logger from "../applications/logger";
 
-export class TypeOrmPinoLogger implements TypeOrmLogger {
-  logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner) {
-      logger.debug({ query, parameters }, 'DB QUERY');
-  }
+export class TypeOrmPinoLogger extends AbstractLogger {
+  protected writeLog(level: LogLevel, logMessage: any, queryRunner?: QueryRunner) {
+    const messages = this.prepareLogMessages(logMessage, {
+      highlightSql: false,
+    }, queryRunner);
 
-  logQueryError(error: string | Error, query: string, parameters?: any[], queryRunner?: QueryRunner) {
-      logger.error({ query, parameters, error}, 'DB QUERY ERROR');
-  }
+    for (let message of messages) {
+      switch(message.type ?? level) {
+        case "log":
+        case "schema-build":
+        case "migration":
+          logger.info(message.message);
+          break
 
-  logQuerySlow(time: number, query: string, parameters?: any[], queryRunner?: QueryRunner) {
-      logger.warn({ time, query, parameters }, 'SLOW QUERY');
-  }
+        case "info":
+        case "query":
+          if (message.prefix) {
+            logger.info(message.prefix, message.message);
+          } else {
+            logger.info(message.message);
+          }
+          break
 
-  logSchemaBuild(message: string, queryRunner?: QueryRunner) {
-      logger.info(message, 'SCHEMA BUILD');
-  }
+        case "warn":
+        case "query-slow":
+          if (message.prefix) {
+            logger.warn(message.prefix, message.message);
+          } else {
+            logger.warn(message.message)
+          }
+          break
 
-  logMigration(message: string, queryRunner?: QueryRunner) {
-      logger.info(message, 'MIGRATION');
-  }
-
-  log(level: "log" | "info" | "warn", message: any, queryRunner?: QueryRunner) {
-    switch (level) {
-      case 'log':
-      case 'info':
-        logger.info(message);
-        break;
-      case 'warn':
-        logger.warn(message);
-        break;
+        case "error":
+        case "query-error":
+          if (message.prefix) {
+            logger.error(message.prefix, message.message)
+          } else {
+            logger.error(message.message)
+          }
+          break
+      }
     }
   }
 }

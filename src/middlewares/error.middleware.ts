@@ -34,7 +34,6 @@ export const errorMiddleware = (error: Error, req: Request, res: Response, next:
       errors: error.message,
     });
   }else{
-
     logger.error({
       msg: 'Unhandled server error',
       error: error.message,

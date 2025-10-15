@@ -6,4 +6,3 @@ export const apiRouter = express.Router();
 
 apiRouter.use(authMiddleware);
 apiRouter.delete('/auth/signout', UserController.signout);
-apiRouter.post('/auth/refresh', UserController.refreshToken);
