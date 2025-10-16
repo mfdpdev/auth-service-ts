@@ -6,6 +6,7 @@ import { ResponseError } from "../errors/response.error";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SignInRequest, SignUpRequest } from "../type/user-request";
+import { ref } from "process";
 
 export class UserService {
   static async signup(request: SignUpRequest): Promise<User> {
@@ -81,7 +82,7 @@ export class UserService {
   }
 
   static async refreshToken(refreshToken: string){
-    if (refreshToken == null) {
+    if (refreshToken == "") {
       throw new ResponseError(401, "Unauthorized");
     }
 

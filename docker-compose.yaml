@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_service_ts_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      NODE_ENV: production
+      # --- KOREKSI LINGKUNGAN APLIKASI ---
+      ENV: production
+      DB_HOST: db                    # Host yang benar
+      PORT: 8000
+      DB_PORT: 5432                  # Port
+      DB_USER: postgres              # User database (yang diminta TypeORM)
+      DB_PASS: postgres              # Password database (yang diminta TypeORM)
+      DB_NAME: auth_service_ts_db    # Nama database
+      # Hapus DATABASE_URL karena kita pakai host, port, user, pass individual
+    
+    depends_on:
+      db:
+        condition: service_healthy
+        
+    command: sh -c "pnpm run migration:run:prod && pnpm start"
+
+volumes:
+  postgres_data:

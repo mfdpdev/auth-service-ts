@@ -1,6 +1,6 @@
 import supertest from "supertest";
-import { web } from "./../src/applications/web.ts";
-import { AppDataSource } from "../src/config/database.config.ts";
+import { web } from "./../src/applications/web";
+import { AppDataSource } from "../src/config/database.config";
 
 describe("POST /api/v1/auth/signup", () => {
   beforeAll(async() => {

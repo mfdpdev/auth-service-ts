@@ -4,12 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "pnpm exec jest",
+
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "migration:generate": "pnpm typeorm migration:generate -d ./src/config/database.config.ts",
     "migration:run": "pnpm typeorm migration:run -d ./src/config/database.config.ts",
     "migration:revert": "pnpm typeorm migration:revert -d ./src/config/database.config.ts",
-    "dev": "nodemon src/main.ts"
+    "dev": "nodemon src/main.ts",
+
+    "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d ./dist/config/database.config.js",
+    "build": "pnpm exec tsc",
+    "start": "node dist/main.js"
   },
   "keywords": [],
   "author": "",

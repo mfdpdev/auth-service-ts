@@ -12,8 +12,12 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: ['src/entities/**/*.ts'],
-  migrations: ['src/migrations/**/*.ts'],
+  entities: process.env.ENV === 'production' 
+    ? ['dist/entities/**/*.js'] 
+    : ['src/entities/**/*.ts'],
+  migrations: process.env.ENV === 'production' 
+    ? ['dist/migrations/**/*.js'] 
+    : ['src/migrations/**/*.ts'],
   synchronize: false,
   logging: true,
   logger: new TypeOrmPinoLogger(),
